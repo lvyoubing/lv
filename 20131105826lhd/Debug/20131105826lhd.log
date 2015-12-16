@@ -1,0 +1,14 @@
+﻿生成启动时间为 2015/10/18 23:46:20。
+     1>项目“C:\Users\24425\Desktop\20131105826lhd\20131105826lhd\20131105826lhd.vcxproj”在节点 2 上(build 个目标)。
+     1>InitializeBuildStatus:
+         正在对“Debug\20131105826lhd.unsuccessfulbuild”执行 Touch 任务。
+       ClCompile:
+         所有输出均为最新。
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yu"StdAfx.h" /Fp"Debug\20131105826lhd.pch" /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt 20131105826lhd.cpp
+         20131105826lhd.cpp
+     1>c:\users\24425\desktop\20131105826lhd\20131105826lhd\20131105826lhd.cpp(15): error C2146: 语法错误: 缺少“;”(在标识符“cout”的前面)
+     1>已完成生成项目“C:\Users\24425\Desktop\20131105826lhd\20131105826lhd\20131105826lhd.vcxproj”(build 个目标)的操作 - 失败。
+
+生成失败。
+
+已用时间 00:00:00.96
