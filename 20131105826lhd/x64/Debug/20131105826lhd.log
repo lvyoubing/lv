@@ -1,10 +1,15 @@
-﻿生成启动时间为 2015/12/17 17:16:12。
+﻿生成启动时间为 2015/12/22 22:38:27。
      1>项目“C:\Users\24425\Documents\GitHub\lv\20131105826lhd\20131105826lhd.vcxproj”在节点 2 上(build 个目标)。
      1>InitializeBuildStatus:
          正在对“x64\Debug\20131105826lhd.unsuccessfulbuild”执行 Touch 任务。
        ClCompile:
          所有输出均为最新。
-         所有输出均为最新。
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\x86_amd64\CL.exe /c /Zi /nologo /W3 /WX- /Od /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yu"StdAfx.h" /Fp"x64\Debug\20131105826lhd.pch" /Fo"x64\Debug\\" /Fd"x64\Debug\vc100.pdb" /Gd /TP /errorReport:prompt 20131105826lhd.cpp
+         20131105826lhd.cpp
+     1>20131105826lhd.cpp(375): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include\stdio.h(371) : 参见“sprintf”的声明
+     1>20131105826lhd.cpp(376): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include\stdio.h(371) : 参见“sprintf”的声明
        ManifestResourceCompile:
          所有输出均为最新。
        Link:
@@ -25,4 +30,4 @@
 
 生成成功。
 
-已用时间 00:00:00.50
+已用时间 00:00:01.94
