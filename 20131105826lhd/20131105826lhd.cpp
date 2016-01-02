@@ -382,3 +382,61 @@ void my_mouse_callback(int event,int x,int y,int flags,void* param)
 	   break; 
  }
 } 
+
+
+//5.利用OpenCV在图像上画矩形，并截图
+#include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/opencv.hpp"
+#include <iostream>
+#include <string>
+using namespace cv;
+using namespace std;
+
+// global variable
+static Mat g_img_src;
+static Mat g_img_dst;
+static Mat g_img_sub;
+static bool g_is_rect_inited = false;
+static Point g_rect_tl;
+static string g_window_name = "image";
+
+static void onMouse( int event, int x, int y, int, void* )
+{   
+    if(CV_EVENT_LBUTTONDOWN == event){
+        g_is_rect_inited = true;
+        g_rect_tl = Point(x, y);    
+    }
+    else if (CV_EVENT_MOUSEMOVE == event && g_is_rect_inited){      
+        g_img_src.copyTo(g_img_dst);
+        rectangle(g_img_dst, g_rect_tl, Point(x,y), Scalar_<uchar>::all(200), 3, 8);
+        imshow(g_window_name, g_img_dst);   
+    }
+    else if (CV_EVENT_LBUTTONUP == event && g_rect_tl != Point(x,y)){   
+        g_img_src(Rect(g_rect_tl, Point(x,y))).copyTo(g_img_sub);
+        imshow("sub image", g_img_sub);
+        g_is_rect_inited = false;
+    }
+}
+
+int main(int argc, char** argv){
+    string filename = argc >= 2 ? argv[1] : "lv.png";
+    g_img_src = imread(filename, CV_LOAD_IMAGE_GRAYSCALE);
+    if (g_img_src.empty()){
+        cerr << "[ERROR] : please check your image file name." << endl;
+        return EXIT_FAILURE;
+    }
+    namedWindow(g_window_name, CV_WINDOW_KEEPRATIO);
+    setMouseCallback(g_window_name, onMouse, 0);
+
+    while(true){
+        imshow(g_window_name, g_img_src);
+        int c = waitKey(0);
+        if( (c & 255) == 27 ){ // Esc
+            destroyAllWindows();
+            cout << "Exiting ...\n";
+            break;
+        }
+    }
+    return EXIT_SUCCESS;
+}
