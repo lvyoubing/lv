@@ -444,6 +444,7 @@ int main(int argc, char** argv){
 
 
 //6.opencv运动物体检测
+
  #include "stdafx.h" 
  #include <stdio.h> 
  #include <time.h> 
@@ -455,10 +456,10 @@ int main(int argc, char** argv){
  int main( int argc, char** argv ) 
 { 
  //声明IplImage指针 
-   IplImage* pFrame = NULL;     //pFrame为视频截取的一帧 
-   IplImage* pFrame1 = NULL;    //第一帧 
-   IplImage* pFrame2 = NULL;    //第二帧 
-   IplImage* pFrame3 = NULL;    //第三帧 
+   IplImage* px = NULL;     //pFrame为视频截取的一帧 
+   IplImage* px1 = NULL;    //第一帧 
+   IplImage* px2 = NULL;    //第二帧 
+   IplImage* px3 = NULL;    //第三帧 
  
  
    IplImage* pFrImg = NULL;     //pFrImg为当前帧的灰度图 
@@ -467,36 +468,37 @@ int main(int argc, char** argv){
    IplImage* pFrImgTran = NULL;//pFrImgTran为当前背景处理过的图像 
  
  
-   CvMat* pFrameMat = NULL;     //pFrameMat为当前灰度矩阵 
+   CvMat* pxMat = NULL;     //pFrameMat为当前灰度矩阵 
    CvMat* pFrMat = NULL;      //pFrMat为当前前景图矩阵，当前帧减去背景图 
    CvMat* bg1 = NULL; 
    CvMat* bg2 = NULL; 
    CvMat* bg3 = NULL; 
-   CvMat* pFrMatB = NULL;     //pFrMatB为二值化（0,1）的前景图 
+   CvMat* pFrMatB = NULL;     //pFrMatB为二值化的前景图 
    CvMat* pBkMat = NULL; 
   CvMat* pZeroMat = NULL;               //用于计算bg1 - bg2 的值 
-   CvMat* pZeroMatB = NULL;//用于计算 pZeroMat阈值化后来判断有多少个零的临时矩阵 
+   CvMat* pZeroMatB = NULL;
+   //用于计算 pZeroMat阈值化后来判断有多少个零的临时矩阵 
  
  
    CvCapture* pCapture = NULL; 
  
  
    int warningNum = 0;      //检测到有异物入侵的次数 
-   int nFrmNum = 0;//帧计数 
-   int status = 0;        //状态标志位 
+   int nFrmNum = 0;//帧数 
+   int status = 0;        //状态 
  
  
  //创建窗口 
-   cvNamedWindow("video", 1); 
-   cvNamedWindow("background",1);//背景 
-   cvNamedWindow("foreground",1);//前景 
- //使窗口有序排列 
-   cvMoveWindow("video", 30, 0); 
-  cvMoveWindow("background", 360, 0); 
-   cvMoveWindow("foreground", 690, 0); 
+   cvNamedWindow("原始视频", 1);
+   cvNamedWindow("黑白视频",1);//背景 
+   cvNamedWindow("检测移动灰度图",1);//前景 
+ //窗口的位置
+   cvMoveWindow("原始视频", 10, 0); 
+  cvMoveWindow("黑白视频", 360, 300); 
+   cvMoveWindow("检测移动灰度图", 720, 0); 
  
  
-   if ( argc > 2 ) 
+   if ( argc > 2 ) //arg是命令行总参数的个数
      { 
        fprintf(stderr, "Usage: bkgrd [video_file_name]\n"); 
        return -1; 
@@ -505,7 +507,7 @@ int main(int argc, char** argv){
  
  //打开摄像头     从摄像头取出码流可以使模拟摄像头 
    if (argc ==1) 
-     if ( !(pCapture = cvCaptureFromCAM(0))) 
+     if ( !(pCapture = cvCaptureFromCAM(0))) //cvCaptureFromCAM（）是从摄像头获取帧，
        { 
          fprintf(stderr, "Can not open camera.\n"); 
          return -2; 
@@ -514,7 +516,7 @@ int main(int argc, char** argv){
  
  //打开视频文件 
    if (argc == 2) 
-     if ( !(pCapture = cvCaptureFromFile(argv[1]))) 
+     if ( !(pCapture = cvCaptureFromFile(argv[1]))) //cvCaptureFromFile（）是从视频文件获取帧
        { 
          fprintf(stderr, "Can not open video file %s\n", argv[1]); 
          return -2; 
@@ -528,7 +530,7 @@ int main(int argc, char** argv){
    time(&start);        //time() 返回从1970年1月1号00：00：00开始以来到现在的秒数（有10为数字）。 
    printf("%d\n",start); 
  //逐帧读取视频 
-   while (pFrame = cvQueryFrame( pCapture )) 
+   while (px = cvQueryFrame( pCapture )) //cvQueryFrame是从摄像头获取单帧图片函数
      { 
        nFrmNum++; 
        //如果是第一帧，需要申请内存，并初始化 
@@ -536,70 +538,71 @@ int main(int argc, char** argv){
          { 
  
  
-           pBkImg = cvCreateImage(cvSize(pFrame->width, pFrame->height), IPL_DEPTH_8U,1); 
-           pFrImg = cvCreateImage(cvSize(pFrame->width, pFrame->height), IPL_DEPTH_8U,1); 
-           pBkImgTran = cvCreateImage(cvSize(pFrame->width,pFrame->height), IPL_DEPTH_8U,1); 
-           pFrImgTran = cvCreateImage(cvSize(pFrame->width,pFrame->height), IPL_DEPTH_8U,1); 
+           pBkImg = cvCreateImage(cvSize(px->width, px->height), IPL_DEPTH_8U,1); 
+           pFrImg = cvCreateImage(cvSize(px->width, px->height), IPL_DEPTH_8U,1); 
+           pBkImgTran = cvCreateImage(cvSize(px->width,px->height), IPL_DEPTH_8U,1); 
+           pFrImgTran = cvCreateImage(cvSize(px->width,px->height), IPL_DEPTH_8U,1); 
  
  
-           pBkMat = cvCreateMat(pFrame->height, pFrame->width, CV_32FC1); 
-           pZeroMat = cvCreateMat(pFrame->height, pFrame->width, CV_32FC1); 
-           pFrMat = cvCreateMat(pFrame->height, pFrame->width, CV_32FC1); 
-           pFrMatB = cvCreateMat(pFrame->height, pFrame->width, CV_8UC1); 
-           pZeroMatB = cvCreateMat(pFrame->height, pFrame->width, CV_8UC1); 
-           pFrameMat = cvCreateMat(pFrame->height, pFrame->width, CV_32FC1); 
-           cvZero(pZeroMat); 
+           pBkMat = cvCreateMat(px->height, px->width, CV_32FC1); 
+           pZeroMat = cvCreateMat(px->height, px->width, CV_32FC1); 
+           pFrMat = cvCreateMat(px->height, px->width, CV_32FC1); 
+           pFrMatB = cvCreateMat(px->height, px->width, CV_8UC1); 
+           pZeroMatB = cvCreateMat(px->height, px->width, CV_8UC1); 
+           pxMat = cvCreateMat(px->height, px->width, CV_32FC1); 
+           cvZero(pZeroMat); //是让矩阵的值都为0,有初始化的作用
            //转化成单通道图像再处理 
-           cvCvtColor(pFrame, pBkImg, CV_BGR2GRAY); 
+           cvCvtColor(px, pBkImg, CV_BGR2GRAY); //颜色空间转换函数，把摄像头里的图像转换成灰度图
            //转换为矩阵 
            cvConvert(pFrImg, pBkMat); 
          } 
        else //不是第一帧的就这样处理 
          { 
-           //pFrImg为当前帧的灰度图 
-           cvCvtColor(pFrame, pFrImg, CV_BGR2GRAY); 
+           //把图像转换为当前帧的灰度图 
+           cvCvtColor(px, pFrImg, CV_BGR2GRAY); 
  
  
-           //pFrameMat为当前灰度矩阵 
-           cvConvert(pFrImg, pFrameMat); 
+           //pxMat为当前灰度矩阵 
+           cvConvert(pFrImg, pxMat); 
  
  
            //pFrMat为前景图矩阵，当前帧减去背景图 
-           cvAbsDiff(pFrameMat, pBkMat, pFrMat); 
+           cvAbsDiff(pxMat, pBkMat, pFrMat); 
  
  
-           //pFrMatB为二值化（0,1）的前景图 
-           cvThreshold(pFrMat,pFrMatB, 60, 1, CV_THRESH_BINARY); 
+           //pFrMatB为二值化的前景图 
+           cvThreshold(pFrMat,pFrMatB, 60, 1, CV_THRESH_BINARY); //二值化是将图像上的像素点的灰度值设置为0或255
  
  
-           //将图像矩阵转化为图像格式，用以显示 
+           //将图像矩阵转化为图像格式，显示出来 
           cvConvert(pBkMat, pBkImgTran);    
            cvConvert(pFrMat, pFrImgTran);   
  
  
            //显示图像 
-           cvShowImage("video", pFrame); 
-           cvShowImage("background", pBkImgTran); //显示背景 
-           cvShowImage("foreground", pFrImgTran); //显示前景 
+           cvShowImage("原始视频", px); //帧
+           cvShowImage("黑白视频", pBkImgTran); //显示背景 
+           cvShowImage("检测移动灰度图", pFrImgTran); //显示前景 
  
  
            //以上是每抓取一帧都要做的工作，下面进行危险检测 
+
  		   
-           if (cvCountNonZero(pFrMatB) > 10000 && status == 0) //表示是第一帧的异物大于1W个像数点 
+           if (cvCountNonZero(pFrMatB) > 10000 && status == 0) //表示是第一帧的异物大于1W个像数点 ，cvCountNonZero（）是输出非零点的个数，其矩阵须为单通道图像 
              { 
-			  /* 则需要将当前帧存储为第一帧 */ 
-               pFrame1 = cvCloneImage(pFrame); 
+			  
+               px1 = cvCloneImage(px);// 需要将当前帧存储为第一帧 
               bg1 = cvCloneMat(pFrMat); 
                status = 1;      //继续采集第2帧 
              } 
            else if (cvCountNonZero(pFrMatB) < 10000 && status == 1) // 表示第一帧的异物大于1W个像数点，而第二帧没有,则报警 
              { 
-               printf("NO.%d warning!!!!\n\n",warningNum++); 
+               printf("哈哈哈",warningNum++); 
               status = 0; 
             } 
            else if (cvCountNonZero(pFrMatB) > 10000 && status == 1)// 表示第一帧和第二帧的异物都大于1W个像数点 
             { 
-             pFrame2 = cvCloneImage(pFrame); 
+             px2 = cvCloneImage(px); //将当前帧存储为第二帧
                bg2 = cvCloneMat(pFrMat); 
 
  
@@ -607,7 +610,7 @@ int main(int argc, char** argv){
                cvThreshold(pZeroMat,pZeroMatB, 20, 1, CV_THRESH_BINARY); 
                if (cvCountNonZero(pZeroMatB) > 3000 ) //表示他们不连续，这样的话要报警 
                 { 
-                 printf("NO.%d warning!!!!\n\n",warningNum++); 
+                 printf("哈哈哈",warningNum++); 
                    status = 0; 
                 } 
                else 
@@ -618,12 +621,12 @@ int main(int argc, char** argv){
            else if (cvCountNonZero(pFrMatB) < 10000 && status == 2)//表示第一帧和第二帧的异物都大于1W个像数点,而第三帧没有 
              { 
                //报警 
-               printf("NO.%d warning!!!!\n\n",warningNum++); 
+               printf("哈哈哈",warningNum++); 
                status = 0; 
              } 
           else if (cvCountNonZero(pFrMatB) > 10000 && status == 2)//表示连续3帧的异物都大于1W个像数点 
              { 
-               pFrame3 = cvCloneImage(pFrame); 
+               px3 = cvCloneImage(px); //将当前帧存储为第三帧
                bg3 = cvCloneMat(pFrMat); 
 
  
@@ -631,12 +634,12 @@ int main(int argc, char** argv){
               cvThreshold(pZeroMat,pZeroMatB, 20, 1, CV_THRESH_BINARY); 
                if (cvCountNonZero(pZeroMatB) > 3000 ) //表示他们不连续，这样的话要报警 
                  { 
-                  printf("NO.%d warning!!!!\n\n",warningNum++); 
+                  printf("哈哈哈",warningNum++); 
                 } 
               else //表示bg2,bg3连续 
                 { 
-                  cvReleaseMat(&pBkMat); 
-                   pBkMat = cvCloneMat(pFrameMat); //更新背景 
+                  cvReleaseMat(&pBkMat); //释放矩阵
+                   pBkMat = cvCloneMat(pxMat); //更新背景 
                } 
                 status = 0;                //进入下一次采集过程 
              } 
@@ -653,9 +656,9 @@ int main(int argc, char** argv){
  
  
  //销毁窗口 
-     cvDestroyWindow("video"); 
-     cvDestroyWindow("background"); 
-    cvDestroyWindow("foreground"); 
+     cvDestroyWindow("原始视频"); 
+     cvDestroyWindow("黑白视频"); 
+    cvDestroyWindow("检测移动灰度图"); 
 
  
 //释放图像和矩阵 
@@ -663,7 +666,7 @@ int main(int argc, char** argv){
      cvReleaseImage(&pBkImg); 
 
  
-     cvReleaseMat(&pFrameMat); 
+     cvReleaseMat(&pxMat); 
      cvReleaseMat(&pFrMat); 
      cvReleaseMat(&pBkMat); 
 
